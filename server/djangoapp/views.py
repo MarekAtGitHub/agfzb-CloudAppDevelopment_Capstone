@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
 # from .restapis import related methods
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required  # For authentication checks
 from django.contrib import messages
 from datetime import datetime
 import logging
@@ -31,14 +33,46 @@ def contact(request):
 # Create a `login_request` view to handle sign in request
 # def login_request(request):
 # ...
+def login_request(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Logged in successfully.")
+                return redirect('djangoapp:index')  # Redirect to the home page after successful login
+        else:
+            messages.error(request, "Invalid login credentials. Please try again.")
+    else:
+        form = AuthenticationForm()
+        
+    return render(request, 'djangoapp/login.html', {'form': form})
 
 # Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
-
+def logout_request(request):
+    logout(request)
+    messages.success(request, "Logged out successfully.")
+    return render(request, 'djangoapp/logout.html')
 # Create a `registration_request` view to handle sign up request
 # def registration_request(request):
-# ...
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f"Account created for {username}. You can now log in.")
+            return redirect('djangoapp:login_view')
+        else:
+            # Debugging output
+            print(form.errors)  # You can also log this information
+    else:
+        form = UserCreationForm()
+    return render(request, 'djangoapp/registration.html', {'form': form})
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):

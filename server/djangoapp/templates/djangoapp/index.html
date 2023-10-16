@@ -33,6 +33,32 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="contact">Contact Us</a>
                     </li>
+                    <!-- Add Login Form -->
+                    <li class="nav-item">
+                        <form class="form-inline" method="post" action="{% url 'djangoapp:login_view' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="text" name="username" class="form-control" placeholder="Username" required>
+                                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </form>
+                    </li>
+                    <!-- Add Signup Link -->
+                </ul>
+                <!-- Add Authenticated User Menu -->
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        {% if user.is_authenticated %}
+                            <span class="navbar-text">Welcome, {{ user.first_name }}</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                        {% else %}
+                            <span class="navbar-text">Guest</span>
+                        </li>
+                        {% endif %}
+                    </li>
                 </ul>
             </div>
         </nav>
