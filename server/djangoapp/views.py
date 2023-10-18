@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
 # from .restapis import related methods
+from .restapis import get_dealer_reviews_from_cf, get_dealers_from_cf
+
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required  # For authentication checks
@@ -89,6 +91,13 @@ def get_dealerships(request):
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
+
+def get_dealer_details(request, dealer_id):
+    if request.method == "GET":
+        url = "your-cloud-function-domain/reviews/review-get"  # Replace with your actual URL
+        reviews = get_dealer_reviews_from_cf(url, dealer_id)
+        return render(request, 'djangoapp/dealer_details.html', {'reviews': reviews})
+
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):

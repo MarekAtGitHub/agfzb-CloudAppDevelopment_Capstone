@@ -52,6 +52,21 @@ class CarDealer:
     def __str__(self):
         return "Dealer name: " + self.full_name
 
+class DealerReview(models.Model):
+    dealership = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    purchase = models.BooleanField()
+    review = models.TextField()
+    purchase_date = models.DateField()
+    car_make = models.CharField(max_length=100)
+    car_model = models.CharField(max_length=100)
+    car_year = models.IntegerField()
+    sentiment = models.CharField(max_length=10)
+    id = models.IntegerField(primary_key=True)
+
+    def __str__(self):
+        return self.name
+
 
 
 # Create your models here.
