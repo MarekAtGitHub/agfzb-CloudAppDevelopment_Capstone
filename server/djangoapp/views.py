@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
-from .models import CarDealer
+from .models import CarDealer, CarModel, DealerReview
 # from .restapis import related methods
 from .restapis import get_dealer_reviews_from_cf, get_dealers_from_cf
 
@@ -116,3 +116,47 @@ def get_dealer_details(request, dealer_id):
 # def add_review(request, dealer_id):
 # ...
 
+def add_review(request, dealer_id):
+    if request.method == 'GET':
+        # Query cars with the dealer id to be reviewed
+        cars = CarModel.objects.filter(dealer_id=dealer_id)
+        
+        # Append the queried cars into context
+        context = {
+            'cars': cars,
+            'dealer_id': dealer_id,
+        }
+        return render(request, 'djangoapp/add_review.html', context)
+
+    elif request.method == 'POST':
+        dealer_id = request.POST.get('dealer_id')  # You may need to retrieve dealer_id from the form or URL
+        review_content = request.POST.get('content')
+        purchased = request.POST.get('purchasecheck')
+        car_id = request.POST.get('car')
+        purchasedate = request.POST.get('purchasedate')
+
+        # Use datetime.utcnow().isoformat() to format the review time
+        review_time = datetime.utcnow().isoformat()
+
+        # Use car.year.strftime("%Y") to get the year from the date field
+        car = CarModel.objects.get(id=car_id)
+        purchase_year = car.year.strftime("%Y")
+
+        # Create a DealerReview object and save it to the database
+        review = DealerReview(
+            dealership=dealer_id,
+            name="Your User Name",  # Replace with user authentication if available
+            purchase=(purchased == 'on'),  # Convert checkbox input to a boolean
+            review=review_content,
+            purchase_date=purchasedate,
+            car_make=car.make.name,
+            car_model=car.name,
+            car_year=purchase_year,
+            sentiment="Unknown",
+        )
+        review.save()
+
+        # Redirect to the dealer details page for the dealer_id
+        return redirect('djangoapp:dealer_details', dealer_id=dealer_id)
+
+    return HttpResponse("Invalid request method")
