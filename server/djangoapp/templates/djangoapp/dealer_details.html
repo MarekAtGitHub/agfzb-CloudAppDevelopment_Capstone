@@ -10,7 +10,10 @@
     <body>
 
     <!--Add a nav bar here -->
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Your Dealership Reviews</a>
+        <!--more navigation links here later-->
+    </nav>
     <!-- Add reviews as cards -->
 
     <!DOCTYPE html>
@@ -53,6 +56,20 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Display Reviews -->
+            <div class="card-columns">
+                {% for review in reviews %}
+                    <div class="card">
+                        <img class="card-img-left" src="{% static 'emoji/'|add:review.sentiment|add:'.png' %}" alt="Sentiment Emoji">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ review.car_make }} - {{ review.car_model }}</h5>
+                            <p class="card-title">Purchase Year: {{ review.car_year }}</p>
+                            <p class="card-text">{{ review.review }}</p>
                         </div>
                     </div>
                 {% endfor %}

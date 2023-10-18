@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
+from .models import CarDealer
 # from .restapis import related methods
 from .restapis import get_dealer_reviews_from_cf, get_dealers_from_cf
 
@@ -79,13 +80,15 @@ def signup(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
-        url = "your-cloud-function-domain/dealerships/dealer-get"
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/b81143fb-ebf7-455a-b7a0-fe558100017e/default/getDealerships"
         # Get dealers from the URL
-        dealerships = get_dealers_from_cf(url)
+        dealerships = CarDealer.objects.all()
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        context = {
+            "dealerships": dealerships  # Updated context variable name
+        }
+
+        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
